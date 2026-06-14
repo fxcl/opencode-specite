@@ -1,0 +1,43 @@
+{
+  "name": "specite",
+  "version": "0.1.0",
+  "description": "Spec-driven iterative development workflow companion CLI for OpenCode",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fxcl/opencode-specite"
+  },
+  "homepage": "https://github.com/fxcl/opencode-specite",
+  "bugs": {
+    "url": "https://github.com/fxcl/opencode-specite/issues"
+  },
+  "keywords": [
+    "opencode",
+    "spec",
+    "cli",
+    "workflow",
+    "iteration"
+  ],
+  "bin": {
+    "specite": "./bin/specite.js"
+  },
+  "scripts": {
+    "postinstall": "node install.mjs"
+  },
+  "files": [
+    "bin/",
+    "install.mjs"
+  ],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "engines": {
+    "node": ">=14"
+  }
+}

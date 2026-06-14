@@ -1,0 +1,20 @@
+# Python-generated files
+.ruff_cache
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.opencode/agents/
+.opencode/commands/
+
+# Rust
+/target
+
+# npm — downloaded binaries (keep the JS wrapper, ignore the native binary)
+npm/bin/specite
+npm/bin/specite.exe

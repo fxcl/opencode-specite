@@ -1,0 +1,146 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  # ── Build binaries for each platform ─────────────────────────────
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS ARM64 (Apple Silicon)
+          - target: darwin-arm64
+            os: macos-14
+            archive: tar.gz
+          # macOS Intel (x64)
+          - target: darwin-x64
+            os: macos-13
+            archive: tar.gz
+          # Linux x64 (AMD64)
+          - target: linux-x64
+            os: ubuntu-22.04
+            archive: tar.gz
+          # Linux ARM64 (cross-compile)
+          - target: linux-arm64
+            os: ubuntu-22.04
+            archive: tar.gz
+            cross: true
+            rust_target: aarch64-unknown-linux-gnu
+          # Windows x64
+          - target: windows-x64
+            os: windows-latest
+            archive: zip
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      # Cross-compilation for linux-arm64
+      - name: Install cross
+        if: matrix.cross
+        run: cargo install cross
+
+      - name: Build binary
+        shell: bash
+        run: |
+          if [ "${{ matrix.cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.rust_target }}
+          else
+            cargo build --release
+          fi
+
+      # ── Package ──────────────────────────────────────────────────
+      - name: Package (tar.gz) — Unix
+        if: matrix.archive == 'tar.gz'
+        shell: bash
+        run: |
+          if [ "${{ matrix.cross }}" = "true" ]; then
+            BINARY="target/${{ matrix.rust_target }}/release/specite"
+          else
+            BINARY="target/release/specite"
+          fi
+          tar czf "specite-${{ matrix.target }}.tar.gz" -C "$(dirname "$BINARY")" specite
+
+      - name: Package (zip) — Windows
+        if: matrix.archive == 'zip'
+        shell: bash
+        run: |
+          cd target/release
+          7z a "$GITHUB_WORKSPACE/specite-${{ matrix.target }}.zip" specite.exe
+
+      - name: Verify archive
+        shell: bash
+        run: |
+          echo "=== Archive contents ==="
+          if [[ "${{ matrix.archive }}" == "tar.gz" ]]; then
+            tar tzf "specite-${{ matrix.target }}.tar.gz"
+          else
+            7z l "specite-${{ matrix.target }}.zip"
+          fi
+          echo "=== Archive info ==="
+          ls -lh "specite-${{ matrix.target }}.${{ matrix.archive }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: specite-${{ matrix.target }}
+          path: specite-${{ matrix.target }}.${{ matrix.archive }}
+
+  # ── Create GitHub Release ─────────────────────────────────────────
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh artifacts/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/*.tar.gz
+            artifacts/*.zip
+
+  # ── Publish to npm ────────────────────────────────────────────────
+  publish-npm:
+    name: Publish to npm
+    needs: release
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Publish npm package
+        run: |
+          cd npm
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

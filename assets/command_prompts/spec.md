@@ -1,0 +1,30 @@
+Based on above user idea, follow this workflow strictly:
+
+0. Read `.specite/templates/SPEC.md` and treat it as the required template for all following steps.
+
+1. Gather requirements with the `question` tool.
+   - The first question must be: `Iteration name`.
+   - Suggest a kebab-case default iteration name derived from the user idea.
+   - Keep asking follow-up questions until you have enough information to write a complete SPEC.
+
+2. Run command `specite new <iteration-name>`, where `<iteration-name>` is the confirmed iteration name from step 1.
+
+3. Inspect and understand the current workspace situation.
+   - Delegate the exploration to one `@explore` agent.
+   - Focusing on goal related parts.
+
+4. Identify external library dependencies needed for this iteration.
+   - List the key libraries that are likely required.
+   - Review these existing docs in .specite/docs/ first to understand what has already been researched. 
+   - Focus new research only on libraries, APIs, or patterns not yet covered.
+   - Delegate research to `@web-researcher` agents, one agent per library.
+   - Use this exact delegation prompt template:
+     - `{{research_prompt}}`
+   - Read the newly created research reports in .specite/docs/
+
+5. Create the SPEC document.
+   - Fill every template section with concise but actionable content based on the gathered QAs, workspace exploration, and research reports.
+   - Keep sections that are not applicable and write `N/A` with a brief reason instead of deleting them.
+   - Save it to: `.specite/iterations/<iteration-name>/SPEC.md`,
+   - Run command `specite update 1 specified`
+{{agentsmd_step}}
