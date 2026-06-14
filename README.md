@@ -11,7 +11,7 @@ Specite installs once as a Rust binary, then runs directly inside any initialize
 ### npm (recommended)
 
 ```bash
-npm install -g specite
+npm install -g @fnnm/specite
 ```
 
 No Rust toolchain required — npm downloads the pre-built binary for your platform automatically.

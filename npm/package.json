@@ -1,5 +1,5 @@
 {
-  "name": "specite",
+  "name": "@fnnm/specite",
   "version": "0.1.0",
   "description": "Spec-driven iterative development workflow companion CLI for OpenCode",
   "license": "MIT",
