@@ -124,3 +124,24 @@ jobs:
           files: |
             artifacts/*.tar.gz
             artifacts/*.zip
+
+  # ── Publish to npm ────────────────────────────────────────────────
+  publish-npm:
+    name: Publish npm
+    needs: release
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Publish
+        working-directory: npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
