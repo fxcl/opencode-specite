@@ -1,6 +1,6 @@
 {
   "name": "@fnnm/specite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Spec-driven iterative development workflow companion CLI for OpenCode",
   "license": "MIT",
   "repository": {
