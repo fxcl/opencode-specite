@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fxcl/opencode-specite"
+    "url": "git+https://github.com/fxcl/opencode-specite.git"
   },
   "homepage": "https://github.com/fxcl/opencode-specite",
   "bugs": {
@@ -19,7 +19,7 @@
     "iteration"
   ],
   "bin": {
-    "specite": "./bin/specite.js"
+    "specite": "bin/specite.js"
   },
   "scripts": {
     "postinstall": "node install.mjs"
